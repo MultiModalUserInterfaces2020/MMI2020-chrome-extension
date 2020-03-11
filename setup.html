@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Setup access to microphone</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container py-5">
+    <div class="jumbotron">
+        <h1>Setup</h1>
+        <p class="lead">Your browser will ask you for permission to use the microphone. You need to allow access to the microphone in order to use this extension.</p>
+        <div class="js-success d-none">
+            <p>✓ The setup of the microphone was completed successfully.</p>
+            <a href="demo.html" class="btn btn-primary">Go to demo</a>
+        </div>
+        <div class="js-error d-none">
+            <p>The setup of the microphone did not work or you did not allow the extension to access the microphone.</p>
+            <button class="btn btn-primary js-try-again">Try again</button>
+        </div>
+    </div>
+</div>
+
+<script src="setup.js"></script>
+
+</body>
+</html>
