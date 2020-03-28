@@ -1,0 +1,50 @@
+{
+  "name": "mmi2020-chrome-extension",
+  "version": "0.0.1",
+  "description": "Improve browsing experience using eye-tracking and voice commands",
+  "main": "src/js/background.js",
+  "dependencies": {
+    "bootstrap": "^4.4.1",
+    "jquery": "^3.4.1"
+  },
+  "devDependencies": {
+    "autoprefixer": "^9.7.5",
+    "cssnano": "^4.1.10",
+    "gulp": "^4.0.2",
+    "gulp-clean": "^0.4.0",
+    "gulp-cleanhtml": "^1.0.3",
+    "gulp-jshint": "^2.1.0",
+    "gulp-postcss": "^8.0.0",
+    "gulp-sass": "^4.0.2",
+    "gulp-sourcemaps": "^2.6.5",
+    "gulp-strip-debug": "^3.0.0",
+    "gulp-terser": "^1.2.0",
+    "gulp-uglify": "^3.0.2",
+    "gulp-zip": "^5.0.1",
+    "jshint": "^2.11.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MultiModalUserInterfaces2020/MMI2020-chrome-extension.git"
+  },
+  "keywords": [
+    "voice",
+    "eye-tracking",
+    "chrome",
+    "extension"
+  ],
+  "author": "Christian Fries (https://github.com/christian-fries)",
+  "contributors": [
+    "Christian Fries (https://github.com/christian-fries)",
+    "Christian Züricher (https://github.com/jacktraror)",
+    "Loïc Rosset (https://github.com/LoRosset)"
+  ],
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MultiModalUserInterfaces2020/MMI2020-chrome-extension/issues"
+  },
+  "homepage": "https://github.com/MultiModalUserInterfaces2020/MMI2020-chrome-extension#readme"
+}

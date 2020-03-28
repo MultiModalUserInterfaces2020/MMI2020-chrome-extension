@@ -4,7 +4,7 @@
   "description": "Improve browsing experience using eye-tracking and voice commands",
   "permissions": ["activeTab", "contextMenus", "declarativeContent", "storage"],
   "background": {
-    "scripts": ["background.js"],
+    "scripts": ["dist/scripts/background.js"],
     "persistent": false
   },
   "browser_action": {

@@ -4,9 +4,23 @@ This repository contains the code for the mini project developed during the cour
 
 ## Enable the extension
 
-To enable the extension managed in this repository in your browser, follow the three steps in the [Getting Started Tutorial](https://developer.chrome.com/extensions/getstarted#manifest).
+To enable the extension managed in this repository in your browser, follow the three steps in the [Getting Started Tutorial](https://developer.chrome.com/extensions/getstarted#manifest). Open the folder `src` as root of the extension.
 
 ## Development
+
+### Install dependencies
+
+Run `npm install` to install the dependencies for this project.
+
+### Watcher task
+
+Start the default gulp task before changing the code by running `gulp`. It will watch the source files and process them.
+
+### Build
+
+To create a new build of the extension, run `gulp build`.
+
+### Code completion
 
 When using WebStorm or PhpStorm to work on this project, enable the library `chrome` to get code completion.
 
