@@ -8,7 +8,7 @@ let tryAgainButton = document.querySelector('.js-try-again');
 
 tryAgainButton.onclick = function() {
   requestAccessToMicrophone();
-}
+};
 
 function requestAccessToMicrophone() {
   navigator.webkitGetUserMedia({ audio: true }, mediaStream => {
@@ -16,7 +16,7 @@ function requestAccessToMicrophone() {
     onSuccess();
   }, err => {
     console.log(err);
-    onError()
+    onError();
   });
 }
 

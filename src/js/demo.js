@@ -34,6 +34,21 @@ document.body.onclick = function() {
   console.log('Ready to receive a color command.');
 }
 
+//Listen to registered command
+chrome.commands.onCommand.addListener(function(command) {
+  console.log('Command:', command);
+  recognition.start();
+  console.log('Ready to receive a color command.');
+  const imageURL = chrome.runtime.getURL('get_started48.png');
+  const notificationOptions = {
+    type: 'basic',
+    iconUrl: imageURL,
+    title: 'Activation of voice recognition',
+    message: "The extension is now listening to your voice !"
+  }
+  chrome.notifications.create('listeningToVoice', notificationOptions);
+});
+
 recognition.onresult = function(event) {
   // The SpeechRecognitionEvent results property returns a SpeechRecognitionResultList object
   // The SpeechRecognitionResultList object contains SpeechRecognitionResult objects.

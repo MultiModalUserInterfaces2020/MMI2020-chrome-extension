@@ -39,6 +39,19 @@ chrome.contextMenus.onClicked.addListener(function(data, tab) {
   });
 });
 
+//Listen to registered command
+chrome.commands.onCommand.addListener(function(command) {
+  console.log('Command:', command);
+  const imageURL = chrome.runtime.getURL('get_started48.png');
+  const notificationOptions = {
+    type: 'basic',
+    iconUrl: imageURL,
+    title: 'Activation of voice recognition',
+    message: "Our extension is now listening to your voice !"
+  }
+  chrome.notifications.create('listeningVoice', notificationOptions);
+});
+
 // Initially create the context menu item
 function createContextMenuItem() {
   chrome.contextMenus.removeAll();

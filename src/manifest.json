@@ -2,7 +2,7 @@
   "name": "MMI2020",
   "version": "0.0.1",
   "description": "Improve browsing experience using eye-tracking and voice commands",
-  "permissions": ["activeTab", "contextMenus", "declarativeContent", "storage"],
+  "permissions": ["activeTab", "contextMenus", "declarativeContent", "storage", "notifications"],
   "background": {
     "scripts": ["dist/scripts/background.js"],
     "persistent": false
@@ -22,5 +22,18 @@
     "48": "images/get_started48.png",
     "128": "images/get_started128.png"
   },
+  "commands": {
+    "activate-voice-command": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y",
+        "mac": "Command+Shift+Y"
+      },
+      "description": "Activate voice command"
+    }
+  },
+  "web_accessible_resources": [
+    "images/*.png",
+    "get_started48.png"
+  ],
   "manifest_version": 2
 }
