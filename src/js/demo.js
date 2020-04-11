@@ -6,12 +6,14 @@ let speechRecognitionEvent = webkitSpeechRecognitionEvent;
 
 let colors = [ 'aqua' , 'azure' , 'beige', 'bisque', 'black', 'blue', 'brown', 'chocolate', 'coral', 'crimson', 'cyan', 'fuchsia', 'ghostwhite', 'gold', 'goldenrod', 'gray', 'green', 'indigo', 'ivory', 'khaki', 'lavender', 'lime', 'linen', 'magenta', 'maroon', 'moccasin', 'navy', 'olive', 'orange', 'orchid', 'peru', 'pink', 'plum', 'purple', 'red', 'salmon', 'sienna', 'silver', 'snow', 'tan', 'teal', 'thistle', 'tomato', 'turquoise', 'violet', 'white', 'yellow'];
 let grammar = '#JSGF V1.0; grammar colors; public <color> = ' + colors.join(' | ') + ' ;'
-
+let grammarCommand = '#JSGF V1.0 ISO8859-1 en; grammar com.acme.commands;'+
+    ' public <basicCmd> = <command>; <command> = /2/ select |/1/ deselect |/2/ save |/1/ cancel ;'
 console.log('Ready demo');
 
 let recognition = new speechRecognition();
 let speechRecognitionList = new speechGrammarList();
 speechRecognitionList.addFromString(grammar, 1);
+speechRecognitionList.addFromString(grammarCommand);
 recognition.grammars = speechRecognitionList;
 recognition.continuous = false;
 recognition.lang = 'en-US';
@@ -34,11 +36,19 @@ document.body.onclick = function() {
   console.log('Ready to receive a color command.');
 }
 
+//Function to retrieve position of the mouse --> TO CHANGE WITH EYETRACKER
+let xMousePosition = 0;
+let yMousePosition = 0;
+window.addEventListener('mousemove', function (e){
+  xMousePosition = e.x;
+  yMousePosition = e.y;
+});
+
 //Listen to registered command
 chrome.commands.onCommand.addListener(function(command) {
   console.log('Command:', command);
   recognition.start();
-  console.log('Ready to receive a color command.');
+  console.log('Ready to receive a command.');
   const imageURL = chrome.runtime.getURL('get_started48.png');
   const notificationOptions = {
     type: 'basic',
@@ -48,6 +58,8 @@ chrome.commands.onCommand.addListener(function(command) {
   }
   chrome.notifications.create('listeningToVoice', notificationOptions);
 });
+
+
 
 recognition.onresult = function(event) {
   // The SpeechRecognitionEvent results property returns a SpeechRecognitionResultList object
@@ -59,8 +71,23 @@ recognition.onresult = function(event) {
   // The second [0] returns the SpeechRecognitionAlternative at position 0.
   // We then return the transcript property of the SpeechRecognitionAlternative object
   let color = event.results[0][0].transcript;
-  diagnostic.textContent = 'Result received: ' + color + '.';
-  bg.style.backgroundColor = color;
+  if(color != 'save'){
+    diagnostic.textContent = 'Result received: ' + color + '.';
+    bg.style.backgroundColor = color;
+  }
+  else{
+    let image = document.elementFromPoint(xMousePosition, yMousePosition);
+    //feedback : draw a red rectangle around the picture
+    let ctx = image.id[0].getContext("2d"); //this line throw an error "Cannot read property 'getContext' of undefined"
+    ctx.beginPath();
+    let pos = image.getBoundingClientRect();
+    ctx.rect(pos.x,pos.y,pos.width,pos.height);
+    ctx.strokeStyle = "red";
+    ctx.stroke();
+
+    //save image
+    //TO DO
+  }
   console.log('Confidence: ' + event.results[0][0].confidence);
 }
 
