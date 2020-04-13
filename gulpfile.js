@@ -3,14 +3,34 @@
 let gulp = require('gulp'),
   clean = require('gulp-clean'),
   cleanhtml = require('gulp-cleanhtml'),
+  concat = require('gulp-concat'),
   jshint = require('gulp-jshint'),
-  stripdebug = require('gulp-strip-debug'),
   zip = require('gulp-zip'),
   sass = require('gulp-sass'),
   postcss = require('gulp-postcss'),
   autoprefixer = require('autoprefixer'),
   cssnano = require('cssnano'),
   terser = require('gulp-terser');
+
+let vendorScripts = [
+  'node_modules/jquery/dist/jquery.min.js',
+
+  // Bootstrap
+  // 'node_modules/popper.js/dist/umd/popper.min.js',
+  // 'node_modules/popper.js/dist/umd/popper-utils.min.js',
+  // 'node_modules/bootstrap/js/dist/alert.js',
+  // 'node_modules/bootstrap/js/dist/button.js',
+  // 'node_modules/bootstrap/js/dist/carousel.js',
+  // 'node_modules/bootstrap/js/dist/collapse.js',
+  // 'node_modules/bootstrap/js/dist/dropdown.js',
+  // 'node_modules/bootstrap/js/dist/modal.js',
+  // 'node_modules/bootstrap/js/dist/toast.js',
+  // 'node_modules/bootstrap/js/dist/tooltip.js',
+  // 'node_modules/bootstrap/js/dist/popover.js',
+  // 'node_modules/bootstrap/js/dist/scrollspy.js',
+  // 'node_modules/bootstrap/js/dist/tab.js',
+  // 'node_modules/bootstrap/js/dist/util.js',
+];
 
 // Clean build directory
 gulp.task('clean', function () {
@@ -44,6 +64,11 @@ gulp.task('jshint', function () {
 })
 
 gulp.task('js', function () {
+  gulp.src(vendorScripts)
+    .pipe(concat('vendor.js'))
+    .pipe(terser())
+    .pipe(gulp.dest('src/dist/scripts'));
+
   return gulp.src('src/js/*.js')
     .pipe(terser())
     .pipe(gulp.dest('src/dist/scripts'))
@@ -51,7 +76,6 @@ gulp.task('js', function () {
 
 gulp.task('scripts', gulp.series('jshint', 'js', function () {
   return gulp.src(['src/dist/scripts/*.js', '!src/scripts/vendors/**/.js'])
-    .pipe(stripdebug())
     .pipe(gulp.dest('build/dist/scripts'))
 }))
 
@@ -83,6 +107,7 @@ gulp.task('zip', gulp.series('html', 'scripts', 'scss', 'styles', 'copy', () => 
 gulp.task('watch', function() {
   gulp.watch('src/scss/*.scss', gulp.series('scss'));
   gulp.watch('src/js/*.js', gulp.series('js'));
+  gulp.watch('gulpfile.js', gulp.series('js'));
 })
 
 gulp.task('build', gulp.series('clean', 'zip'));

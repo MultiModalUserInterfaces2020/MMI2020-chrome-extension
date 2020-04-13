@@ -1,16 +1,17 @@
-@import "../../node_modules/bootstrap/scss/functions";
-@import "../../node_modules/bootstrap/scss/mixins";
-
-
-// Custom variables for bootstrap templates
-@import "main/variables";
-
 /*
  * BOOTSTRAP CODE
  */
 
-// Core variables and mixins
+// Configuration
+
+@import "../../node_modules/bootstrap/scss/functions";
+
+// Custom variables for bootstrap templates
+@import "main/variables";
+
 @import "../../node_modules/bootstrap/scss/variables";
+@import "../../node_modules/bootstrap/scss/mixins";
+
 @import "../../node_modules/bootstrap/scss/root";
 @import "../../node_modules/bootstrap/scss/reboot";
 @import "../../node_modules/bootstrap/scss/type";
@@ -48,7 +49,7 @@
 
 
 /*
- * CUSTOM OVERRIDE
+ * CUSTOM CODE
  */
 
 @import "main/base";
