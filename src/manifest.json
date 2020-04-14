@@ -2,13 +2,20 @@
   "name": "MMI2020",
   "version": "0.0.1",
   "description": "Improve browsing experience using eye-tracking and voice commands",
-  "permissions": ["activeTab", "contextMenus", "declarativeContent", "storage", "notifications"],
+  "permissions": ["activeTab", "storage", "notifications"],
   "background": {
     "scripts": ["dist/scripts/background.js"],
     "persistent": false
   },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["dist/scripts/content-script.js"]
+    }
+  ],
   "browser_action": {
     "default_title": "MMI2020",
+    "default_popup": "popup.html",
     "default_icon": {
       "16": "images/get_started16.png",
       "32": "images/get_started32.png",

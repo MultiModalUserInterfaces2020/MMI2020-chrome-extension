@@ -1,71 +1,89 @@
-'use strict';
-
-const contextMenuId = 'toggleAudioCapturing';
-const enableAudioCapturing = 'Capture audio';
-const disableAudioCapturing = 'Disable audio capturing';
+'use strict'
 
 // Setup when extension is installed
-chrome.runtime.onInstalled.addListener(function(details) {
+chrome.runtime.onInstalled.addListener(function (details) {
   // Prepare storage when extension is installed
-  chrome.storage.sync.set({capturingAudio: false}, function() {
-    console.log('Not capturing audio.');
+  chrome.storage.local.set({ capturingAudio: false }, function () {
+    console.log('Not capturing audio.')
   });
-
-  // Prepare context menu
-  createContextMenuItem();
 
   // Open welcome page on first install
   if (details.reason.search(/install/g) === -1) {
-    return
+    return;
   }
   chrome.tabs.create({
-    url: chrome.extension.getURL("setup.html"),
+    url: chrome.extension.getURL('setup.html'),
     active: true
-  })
-});
-
-// Listen to context menu clicks
-chrome.contextMenus.onClicked.addListener(function(data, tab) {
-  console.log('Context menu action triggered for item "' + data.menuItemId + '" with current tab "' + tab.title + '"');
-
-  chrome.storage.sync.get('capturingAudio', function(data) {
-    let shouldCapture = !data.capturingAudio;
-
-    console.log('Change capturing state from ' + data.capturingAudio + ' to ' + shouldCapture);
-
-    chrome.storage.sync.set({capturingAudio: shouldCapture}, function() {
-      updateContextMenuItem(shouldCapture);
-    });
   });
-});
+})
 
-//Listen to registered command
-chrome.commands.onCommand.addListener(function(command) {
-  console.log('Command:', command);
-  const imageURL = chrome.runtime.getURL('get_started48.png');
-  const notificationOptions = {
-    type: 'basic',
-    iconUrl: imageURL,
-    title: 'Activation of voice recognition',
-    message: "Our extension is now listening to your voice !"
+// Listen to START_CAPTURING_AUDIO event from popup
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  if (request.action === 'START_CAPTURING_AUDIO') {
+    startCapturingAudio();
   }
-  chrome.notifications.create('listeningVoice', notificationOptions);
+})
+
+// Listen to shortcut commands
+chrome.commands.onCommand.addListener(function (command) {
+  if (command === 'activate-voice-command') {
+    startCapturingAudio();
+  }
 });
 
-// Initially create the context menu item
-function createContextMenuItem() {
-  chrome.contextMenus.removeAll();
-  chrome.contextMenus.create({
-    title: enableAudioCapturing,
-    id: contextMenuId,
-    contexts: ["browser_action"]
+function startCapturingAudio () {
+  chrome.storage.local.get('capturingAudio', function (res) {
+    const capturingAudio = res.capturingAudio || false;
+    if (capturingAudio) {
+      console.log('Capturing already in progress...');
+      return false;
+    }
+
+    chrome.storage.local.set({ capturingAudio: true }, function () {
+      console.log('Start capturing audio...')
+      chrome.browserAction.setBadgeText({ text: 'Rec.' })
+
+      // TODO: Recognize speech command
+      // Example: Run example action after 2 sec
+      window.setTimeout(function () {
+        exampleAction(function() {
+          stopCapturingAudio();
+        });
+      }, 2000)
+    });
   });
 }
 
-// Update the context menu item
-function updateContextMenuItem(capture) {
-  let label = capture ? disableAudioCapturing : enableAudioCapturing;
-  chrome.contextMenus.update('toggleAudioCapturing', {
-    title: label,
+function stopCapturingAudio () {
+  chrome.storage.local.set({ capturingAudio: false }, function () {
+    chrome.browserAction.setBadgeText({ text: '' });
+    console.log('Stop capturing audio...');
+    chrome.runtime.sendMessage({ action: 'STOP_CAPTURING_AUDIO' });
   });
+}
+
+// Example action: Download the first image on the website
+function exampleAction(callback) {
+  chrome.tabs.query({active: true}, function (tabs) {
+    let tabId = tabs[0].id;
+
+    chrome.tabs.sendMessage(tabId, { action: 'RETURN_FIRST_IMAGE' }, response => {
+      const imageURL = chrome.runtime.getURL('get_started48.png');
+      const notificationOptions = {
+        type: 'basic',
+        iconUrl: imageURL,
+        title: 'Yeah!',
+        message: 'Downloaded the first image on the page'
+      };
+
+      if (response) {
+        chrome.notifications.create('', notificationOptions);
+      } else {
+        notificationOptions.title = 'Doh!';
+        notificationOptions.message = 'There where no images on the page';
+        chrome.notifications.create('', notificationOptions);
+      }
+    });
+  })
+  callback();
 }
