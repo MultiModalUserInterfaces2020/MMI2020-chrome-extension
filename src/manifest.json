@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "Improve browsing experience using eye-tracking and voice commands",
   "permissions": ["activeTab", "storage", "notifications"],
+  "options_page": "options.html",
   "background": {
     "scripts": ["dist/scripts/background.js"],
     "persistent": false

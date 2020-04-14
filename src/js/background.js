@@ -77,13 +77,21 @@ function exampleAction(callback) {
       };
 
       if (response) {
-        chrome.notifications.create('', notificationOptions);
+        createNotification(notificationOptions);
       } else {
         notificationOptions.title = 'Doh!';
         notificationOptions.message = 'There where no images on the page';
-        chrome.notifications.create('', notificationOptions);
+        createNotification(notificationOptions);
       }
     });
   })
   callback();
+}
+
+function createNotification(notificationOptions) {
+  chrome.storage.sync.get(['enableNotifications'], function(options) {
+    if (options.enableNotifications) {
+      chrome.notifications.create('', notificationOptions);
+    }
+  });
 }
