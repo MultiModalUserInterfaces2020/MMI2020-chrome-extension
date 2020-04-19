@@ -2,6 +2,16 @@
 
 This repository contains the code for the mini project developed during the course [Multimodal User Interfaces](https://mcs.unibnf.ch/courses/multimodal-user-interfaces) 2020.
 
+## Available commands
+
+### Example action
+
+With the command `example`, you can download the first image on the currently opened browser tab.
+
+### Download an image 
+
+With the commands `download` or `save`, you can download the image at the current mouse position.
+
 ## Enable the extension
 
 To enable the extension managed in this repository in your browser, follow the three steps in the [Getting Started Tutorial](https://developer.chrome.com/extensions/getstarted#manifest). Open the folder `src` as root of the extension.
