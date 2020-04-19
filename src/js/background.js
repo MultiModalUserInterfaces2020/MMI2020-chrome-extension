@@ -43,13 +43,20 @@ function startCapturingAudio () {
       console.log('Start capturing audio...')
       chrome.browserAction.setBadgeText({ text: 'Rec.' })
 
-      // TODO: Recognize speech command
-      // Example: Run example action after 2 sec
-      window.setTimeout(function () {
-        exampleAction(function() {
-          stopCapturingAudio();
-        });
-      }, 2000)
+      VoiceCommandRecognizer.startRecognizing(function (result) {
+        stopCapturingAudio();
+        if (result === null) {
+          createNotification('Sorry', 'Your command was not recognized');
+        } else {
+          // Run the desired command
+          switch (result.transcript) {
+            case 'save' :
+            case 'download': downloadAction(); break;
+
+            case 'example': exampleAction(); break;
+          }
+        }
+      });
     });
   });
 }
@@ -63,35 +70,126 @@ function stopCapturingAudio () {
 }
 
 // Example action: Download the first image on the website
-function exampleAction(callback) {
+function exampleAction() {
   chrome.tabs.query({active: true}, function (tabs) {
     let tabId = tabs[0].id;
 
     chrome.tabs.sendMessage(tabId, { action: 'RETURN_FIRST_IMAGE' }, response => {
-      const imageURL = chrome.runtime.getURL('get_started48.png');
-      const notificationOptions = {
-        type: 'basic',
-        iconUrl: imageURL,
-        title: 'Yeah!',
-        message: 'Downloaded the first image on the page'
-      };
-
       if (response) {
-        createNotification(notificationOptions);
+        createNotification('Success', 'Downloaded the first image on the page');
       } else {
-        notificationOptions.title = 'Doh!';
-        notificationOptions.message = 'There where no images on the page';
-        createNotification(notificationOptions);
+        createNotification('Sorry', 'There where no images on the page');
       }
     });
   })
-  callback();
 }
 
-function createNotification(notificationOptions) {
+// Download action: Download the image at the mouse position
+function downloadAction() {
+  chrome.tabs.query({active: true}, function (tabs) {
+    let tabId = tabs[0].id;
+
+    chrome.tabs.sendMessage(tabId, { action: 'DOWNLOAD_IMAGE' }, response => {
+      if (response) {
+        createNotification('Success', 'Downloaded the desired image');
+      } else {
+        createNotification('Sorry', 'This image could not be downloaded');
+      }
+    });
+  })
+}
+
+function createNotification(title, message) {
+  const imageURL = chrome.runtime.getURL('get_started48.png');
+  const notificationOptions = {
+    type: 'basic',
+    iconUrl: imageURL,
+    title: title,
+    message: message,
+  };
+
   chrome.storage.sync.get(['enableNotifications'], function(options) {
     if (options.enableNotifications) {
       chrome.notifications.create('', notificationOptions);
     }
   });
 }
+
+(function (VCR) {
+  let speechRecognition = webkitSpeechRecognition;
+  let speechGrammarList = webkitSpeechGrammarList;
+  let commands = ['example', 'save', 'download'];
+  let grammar = '#JSGF V1.0; grammar colors; public <color> = ' + commands.join(' | ') + ' ;'
+  let recognizing = false;
+  let onEndCallback = null;
+  let recognition, speechRecognitionList;
+
+  VCR.init = function() {
+    console.log("Initializing the voice recognizer");
+    setupRecognizer();
+  };
+
+  VCR.startRecognizing = function(callback) {
+    if (recognizing) return;
+
+    recognizing = true;
+    onEndCallback = callback;
+    recognition.start();
+  };
+
+  let setupRecognizer = function() {
+    console.log("Setting up the voice recognizer");
+
+    recognition = new speechRecognition();
+    speechRecognitionList = new speechGrammarList();
+    speechRecognitionList.addFromString(grammar, 1);
+    recognition.grammars = speechRecognitionList;
+    recognition.continuous = false;
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onresult = onResult;
+    recognition.onspeechend = onSpeechEnd;
+    recognition.onnomatch = onNoMatch;
+    recognition.onerror = onError;
+  };
+
+  let onResult = function (e) {
+    console.log('Processing result');
+
+    let command = e.results[0][0].transcript;
+
+    if (onEndCallback !== null) {
+      if (commands.includes(command)) {
+        onEndCallback(e.results[0][0]);
+      } else {
+        onEndCallback(null);
+      }
+      onEndCallback = null;
+    }
+  }
+
+  let onSpeechEnd = function (e) {
+    recognition.stop();
+    recognizing = false;
+
+    console.log('Speech end');
+
+    stopCapturingAudio();
+  }
+
+  let onNoMatch = function (e) {
+    console.log('No match');
+
+    stopCapturingAudio();
+  }
+
+  let onError = function (e) {
+    console.error(e.error);
+
+    stopCapturingAudio();
+  }
+}(window.VoiceCommandRecognizer = window.VoiceCommandRecognizer || {}));
+
+VoiceCommandRecognizer.init();
