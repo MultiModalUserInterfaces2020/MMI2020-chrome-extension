@@ -2,7 +2,6 @@
 // import { getLastCoords } from './tobii-eye-connection.js';
 
 // This file is injected into every web page and has access to the dom of the page
-
 (function (window, MousePosition) {
   let x = 0, y= 0;
 
@@ -33,18 +32,25 @@ var debug = false;
 var wsUri = "ws://127.0.0.1:8181/";
 var websocket = new WebSocket(wsUri);
 
-websocket.onopen = function (e) { };
-websocket.onclose = function (e) { };
-websocket.onerror = function (e) {
-  debugMode(true);
-  console.log("In debug");
+websocket.onopen = function (e) {
+    console.log("Connection with TobiiEye server opened");
+ };
+websocket.onclose = function (e) {
+   console.log("Connection with TobiiEye server closed");
 };
-
+websocket.onerror = function (e) {
+  console.log("Extension was not able to connect to TobiiEye server. Switched to mouse recognition");
+  debugMode(true);
+};
 websocket.onmessage = function (e) {
+  console.log(e);
 	if(!debug) {
-		var coords = e.data.split(";");
+    var coords = e.data.split(";");
+    console.log(coords[0]+"-"+coords[1]);
 		applyCoordinates(coords);
-	}
+	} else {
+    console.log("In debug");
+  }
 };
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -77,8 +83,16 @@ function downloadFirstImage() {
 }
 
 function downloadImage() {
-  // let position = getLastCoords();
-  let position = MousePosition.getPosition();
+  let position;
+  if(debug){
+    position = MousePosition.getPosition();
+  } else {
+    position = getLastCoords();
+  }
+
+  console.log("Get element at: "+position.x+"-"+position.y);
+  console.log("Mouse at posi.: "+MousePosition.getPosition().x+"-"+MousePosition.getPosition().y);
+  
   let element = document.elementFromPoint(position.x, position.y);
 
   if (element.nodeName !== 'IMG' || !element.hasAttribute('src')) {
@@ -114,7 +128,6 @@ function downloadSource(source) {
 //================================================
 
 function updateLastCoords(x,y) {
-  console.log(x+"|"+y);
 	lastX = x;
   lastY = y;
   indicator.style.left=x;

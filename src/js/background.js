@@ -47,7 +47,9 @@ function startCapturingAudio () {
         stopCapturingAudio();
         if (result === null) {
           createNotification('Sorry', 'Your command was not recognized');
+          console.log("--- Your command was not recognized");
         } else {
+          console.log("---"+result.transcript);
           // Run the desired command
           switch (result.transcript) {
             case 'save' :
