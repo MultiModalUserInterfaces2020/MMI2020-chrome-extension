@@ -15,16 +15,6 @@
   };
 }(window, window.MousePosition = window.MousePosition || {}));
 
-var indicator = document.createElement("div");
-indicator.id = "indicator";
-indicator.style.width = "10px";
-indicator.style.height = "10px";
-indicator.style.background = "red";
-indicator.style.borderRadius = "5px";
-indicator.style.position = "fixed";
-
-document.body.appendChild(indicator);
-
 var offsetX = 0.0, offsetY = 0.0;
 var lastX = 0.0, lastY = 0.0;
 var debug = false;
@@ -43,14 +33,10 @@ websocket.onerror = function (e) {
   debugMode(true);
 };
 websocket.onmessage = function (e) {
-  console.log(e);
 	if(!debug) {
     var coords = e.data.split(";");
-    console.log(coords[0]+"-"+coords[1]);
 		applyCoordinates(coords);
-	} else {
-    console.log("In debug");
-  }
+	}
 };
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -89,9 +75,6 @@ function downloadImage() {
   } else {
     position = getLastCoords();
   }
-
-  console.log("Get element at: "+position.x+"-"+position.y);
-  console.log("Mouse at posi.: "+MousePosition.getPosition().x+"-"+MousePosition.getPosition().y);
   
   let element = document.elementFromPoint(position.x, position.y);
 
@@ -130,8 +113,6 @@ function downloadSource(source) {
 function updateLastCoords(x,y) {
 	lastX = x;
   lastY = y;
-  indicator.style.left=x;
-  indicator.style.top=y;
 }
 
 function getLastCoords() {
