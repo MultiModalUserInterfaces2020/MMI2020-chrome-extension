@@ -1,13 +1,17 @@
 'use strict';
-// import { getLastCoords } from './tobii-eye-connection.js';
-
 // This file is injected into every web page and has access to the dom of the page
+
 (function (window, MousePosition) {
   let x = 0, y= 0;
 
   window.addEventListener('mousemove', function (e) {
     x = e.clientX;
     y = e.clientY;
+    // This works since the first method call comes after the initialization and is global inside the script (var).
+    if(useMouse) {
+      indicator.style.left=x+"px";
+      indicator.style.top=y+"px";
+    }
   });
 
   MousePosition.getPosition = function() {
@@ -15,9 +19,22 @@
   };
 }(window, window.MousePosition = window.MousePosition || {}));
 
+var indicator = document.createElement("div");
+indicator.id = "indicator";
+indicator.style.width = "10px";
+indicator.style.height = "10px";
+indicator.style.background = "red";
+indicator.style.borderRadius = "5px";
+indicator.style.position = "fixed";
+indicator.style.zIndex = 9999;
+indicator.style.left="20px";
+indicator.style.top="20px";
+
+document.body.appendChild(indicator);
+
 var offsetX = 0.0, offsetY = 0.0;
 var lastX = 0.0, lastY = 0.0;
-var debug = false;
+var useMouse = false;
 
 var wsUri = "ws://127.0.0.1:8181/";
 var websocket = new WebSocket(wsUri);
@@ -30,10 +47,10 @@ websocket.onclose = function (e) {
 };
 websocket.onerror = function (e) {
   console.log("Extension was not able to connect to TobiiEye server. Switched to mouse recognition");
-  debugMode(true);
+  mouseMode(true);
 };
 websocket.onmessage = function (e) {
-	if(!debug) {
+	if(!useMouse) {
     var coords = e.data.split(";");
 		applyCoordinates(coords);
 	}
@@ -70,7 +87,7 @@ function downloadFirstImage() {
 
 function downloadImage() {
   let position;
-  if(debug){
+  if(useMouse){
     position = MousePosition.getPosition();
   } else {
     position = getLastCoords();
@@ -113,6 +130,8 @@ function downloadSource(source) {
 function updateLastCoords(x,y) {
 	lastX = x;
   lastY = y;
+  indicator.style.left=x+"px";
+  indicator.style.top=y+"px";
 }
 
 function getLastCoords() {
@@ -139,9 +158,9 @@ function applyCoordinates(coords) {
   updateLastCoords(newX,newY);
 }
 
-function debugMode(isDebug) {
-	debug = isDebug;
-	if(debug) {
+function mouseMode(value) {
+	useMouse = value;
+	if(useMouse) {
 		document.addEventListener('mousemove', e => updateLastCoords(e.pageX,e.pageY));
 	} else {
 		document.removeEventListener('mousemove', e => updateLastCoords(e.pageX,e.pageY));
