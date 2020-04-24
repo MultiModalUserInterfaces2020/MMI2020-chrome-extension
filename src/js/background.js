@@ -40,11 +40,13 @@ function startCapturingAudio () {
     }
 
     chrome.storage.local.set({ capturingAudio: true }, function () {
+      startRecordingMousePosition();
       console.log('Start capturing audio...')
       chrome.browserAction.setBadgeText({ text: 'Rec.' })
 
       VoiceCommandRecognizer.startRecognizing(function (result) {
         stopCapturingAudio();
+        stopRecordingMousePosition();
         if (result === null) {
           createNotification('Sorry', 'Your command was not recognized');
         } else {
@@ -71,7 +73,7 @@ function stopCapturingAudio () {
 
 // Example action: Download the first image on the website
 function exampleAction() {
-  chrome.tabs.query({active: true}, function (tabs) {
+  chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
     let tabId = tabs[0].id;
 
     chrome.tabs.sendMessage(tabId, { action: 'RETURN_FIRST_IMAGE' }, response => {
@@ -86,7 +88,7 @@ function exampleAction() {
 
 // Download action: Download the image at the mouse position
 function downloadAction() {
-  chrome.tabs.query({active: true}, function (tabs) {
+  chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
     let tabId = tabs[0].id;
 
     chrome.tabs.sendMessage(tabId, { action: 'DOWNLOAD_IMAGE' }, response => {
@@ -96,6 +98,24 @@ function downloadAction() {
         createNotification('Sorry', 'This image could not be downloaded');
       }
     });
+  })
+}
+
+// Notify action: notify content script to start recording eye position
+function startRecordingMousePosition() {
+  chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+    let tabId = tabs[0].id;
+
+    chrome.tabs.sendMessage(tabId, { action: 'START_RECORDING' });
+  })
+}
+
+// Notify action: notify content script to stop recording eye position
+function stopRecordingMousePosition() {
+  chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+    let tabId = tabs[0].id;
+
+    chrome.tabs.sendMessage(tabId, { action: 'STOP_RECORDING' });
   })
 }
 
