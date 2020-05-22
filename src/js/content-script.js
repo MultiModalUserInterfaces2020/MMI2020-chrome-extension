@@ -77,14 +77,16 @@ let averageEyePositionIndicator = document.createElement('div');
 averageEyePositionIndicator.id = 'averageEyePositionIndicator';
 averageEyePositionIndicator.style.width = '12px';
 averageEyePositionIndicator.style.height = '12px';
-averageEyePositionIndicator.style.background = 'green';
+averageEyePositionIndicator.style.background = 'red';
 averageEyePositionIndicator.style.borderRadius = '5px';
 averageEyePositionIndicator.style.position = 'fixed';
+averageEyePositionIndicator.style.opacity = '0';
+averageEyePositionIndicator.style.transition = 'opacity 0.3s ease';
 averageEyePositionIndicator.style.zIndex = 9999;
 averageEyePositionIndicator.style.left = '10px';
 averageEyePositionIndicator.style.top = '10px';
-eyePositionIndicator.style.marginLeft = '-6px';
-eyePositionIndicator.style.marginTop = '-6px';
+averageEyePositionIndicator.style.marginLeft = '-6px';
+averageEyePositionIndicator.style.marginTop = '-6px';
 
 document.body.appendChild(averageEyePositionIndicator);
 
@@ -203,6 +205,12 @@ function downloadImage() {
   let position = getAveragePosition();
   averageEyePositionIndicator.style.left = position.x + "px";
   averageEyePositionIndicator.style.top = position.y + "px";
+  averageEyePositionIndicator.style.opacity = "0.7";
+
+  window.setTimeout(function() {
+    averageEyePositionIndicator.style.opacity = '0';
+  }, 4000);
+
   recordLastPositions = false;
   lastPositions = [];
   
