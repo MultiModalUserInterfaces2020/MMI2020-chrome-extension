@@ -1,17 +1,18 @@
 'use strict';
 // This file is injected into every web page and has access to the dom of the page
 
-var lastX = 0.0, lastY = 0.0;
-var useMouse = true;
-var lastPositions = [];
-var recordLastPositions = false;
+let lastX = 0.0, lastY = 0.0;
+let useMouse = true;
+let lastPositions = [];
+let recordLastPositions = false;
 
 function updateLastCoords(x,y) {
 	lastX = x;
   lastY = y;
-  indicator.style.left=x+"px";
-  indicator.style.top=y+"px";
-  if(recordLastPositions){
+  eyePositionIndicator.style.left = x + "px";
+  eyePositionIndicator.style.top = y + "px";
+
+  if (recordLastPositions) {
     lastPositions.push({x:x,y:y,t:new Date().getTime()});
   }
 }
@@ -47,44 +48,44 @@ function createNotification(title, message) {
   });
 }
 
-var indicator = document.createElement('div');
-indicator.id = 'eyePositionIndicator';
-indicator.style.width = '12px';
-indicator.style.height = '12px';
-indicator.style.background = 'red';
-indicator.style.borderRadius = '6px';
-indicator.style.position = 'fixed';
-indicator.style.zIndex = 9999;
-indicator.style.left = '20px';
-indicator.style.top = '20px';
-indicator.style.marginLeft = '-6px';
-indicator.style.marginTop = '-6px';
+let eyePositionIndicator = document.createElement('div');
+eyePositionIndicator.id = 'eyePositionIndicator';
+eyePositionIndicator.style.width = '12px';
+eyePositionIndicator.style.height = '12px';
+eyePositionIndicator.style.background = 'red';
+eyePositionIndicator.style.borderRadius = '6px';
+eyePositionIndicator.style.position = 'fixed';
+eyePositionIndicator.style.zIndex = 9999;
+eyePositionIndicator.style.left = '20px';
+eyePositionIndicator.style.top = '20px';
+eyePositionIndicator.style.marginLeft = '-6px';
+eyePositionIndicator.style.marginTop = '-6px';
 
-document.body.appendChild(indicator);
+document.body.appendChild(eyePositionIndicator);
 
-var indicator2 = document.createElement('div');
-indicator2.id = 'averageEyePositionIndicator';
-indicator2.style.width = '12px';
-indicator2.style.height = '12px';
-indicator2.style.background = 'green';
-indicator2.style.borderRadius = '5px';
-indicator2.style.position = 'fixed';
-indicator2.style.zIndex = 9999;
-indicator2.style.left = '10px';
-indicator2.style.top = '10px';
-indicator.style.marginLeft = '-6px';
-indicator.style.marginTop = '-6px';
+let averageEyePositionIndicator = document.createElement('div');
+averageEyePositionIndicator.id = 'averageEyePositionIndicator';
+averageEyePositionIndicator.style.width = '12px';
+averageEyePositionIndicator.style.height = '12px';
+averageEyePositionIndicator.style.background = 'green';
+averageEyePositionIndicator.style.borderRadius = '5px';
+averageEyePositionIndicator.style.position = 'fixed';
+averageEyePositionIndicator.style.zIndex = 9999;
+averageEyePositionIndicator.style.left = '10px';
+averageEyePositionIndicator.style.top = '10px';
+eyePositionIndicator.style.marginLeft = '-6px';
+eyePositionIndicator.style.marginTop = '-6px';
 
-document.body.appendChild(indicator2);
+document.body.appendChild(averageEyePositionIndicator);
 
-var offsetX = 0.0, offsetY = 0.0;
+let offsetX = 0.0, offsetY = 0.0;
 
 chrome.storage.sync.get(['visualizeEyePosition'], function(options) {
   if (options.visualizeEyePosition) {
     useMouse = false;
 
-    var wsUri = "ws://127.0.0.1:8181/";
-    var websocket = new WebSocket(wsUri);
+    let wsUri = "ws://127.0.0.1:8181/";
+    let websocket = new WebSocket(wsUri);
 
     websocket.onopen = function (e) {
         console.log("Connection with TobiiEye server opened");
@@ -99,7 +100,7 @@ chrome.storage.sync.get(['visualizeEyePosition'], function(options) {
     };
     websocket.onmessage = function (e) {
       if(!useMouse) {
-        var coords = e.data.split(";");
+        let coords = e.data.split(";");
         applyCoordinates(coords);
       }
     };
@@ -114,12 +115,14 @@ function startRecordingPosition() {
   lastPositions = [];
   lastPositions.push({x:lastX,y:lastY,t:new Date().getTime()});
   recordLastPositions = true;
+
   return recordLastPositions;
 }
 
 function stopRecordingPosition() {
   recordLastPositions = false;
   lastPositions.push({x:lastX,y:lastY,t:new Date().getTime()});
+
   return !recordLastPositions;
 }
 
@@ -159,49 +162,25 @@ function downloadFirstImage() {
 }
 
 /**
- * Calculates the average mouse position by number of entries (still mouse counts as 1)
- */
-function getAveragePosition() {
-  if(lastPositions.length == 0){
-    if(useMouse){
-      return MousePosition.getPosition();
-    } else {
-      return getLastCoords();
-    }
-  } else if(lastPositions.length == 1){
-    return {x:lastPositions[0].x, y:lastPositions[0].y};
-  }
-  var totalX = 0;
-  var totalY = 0;
-  var size = lastPositions.length;
-  lastPositions.forEach(element => {
-    totalX+=element.x;
-    totalY+=element.y;
-  });
-
-  return {x:totalX/size, y:totalY/size};
-}
-
-/**
  * Calculates the average mouse position by time spend on it
  */
-function getAveragePositionV2() {
-  if(lastPositions.length == 0){
-    if(useMouse){
+function getAveragePosition() {
+  if (lastPositions.length === 0) {
+    if (useMouse) {
       return MousePosition.getPosition();
     } else {
       return getLastCoords();
     }
-  } else if(lastPositions.length == 1){
+  } else if (lastPositions.length === 1) {
     return {x:lastPositions[0].x, y:lastPositions[0].y};
   }
 
-  var totalX = 0;
-  var totalY = 0;
-  var totalTime = lastPositions[lastPositions.length-1].t - lastPositions[0].t;
+  let totalX = 0;
+  let totalY = 0;
+  let totalTime = lastPositions[lastPositions.length-1].t - lastPositions[0].t;
   
   // the very last position is ignored
-  for(let i = 0 ; i < lastPositions.length - 1 ; i++) {
+  for (let i = 0; i < lastPositions.length - 1; i++) {
     let time = lastPositions[i+1].t - lastPositions[i].t;
     totalX += lastPositions[i].x * time;
     totalY += lastPositions[i].y * time;
@@ -211,9 +190,9 @@ function getAveragePositionV2() {
 }
 
 function downloadImage() {
-  let position = getAveragePositionV2();
-  indicator2.style.left=position.x+"px";
-  indicator2.style.top=position.y+"px";
+  let position = getAveragePosition();
+  averageEyePositionIndicator.style.left = position.x + "px";
+  averageEyePositionIndicator.style.top = position.y + "px";
   recordLastPositions = false;
   lastPositions = [];
   
@@ -266,7 +245,7 @@ function getLastCoords() {
 }
 
 function applyCoordinates(coords) {
-    var tracked_values ={
+    let tracked_values ={
         browser_x : Mir_windowTools.get_browserweb_coordinates().x,
         browser_y : Mir_windowTools.get_browserweb_coordinates().y,
         browser_width : Mir_windowTools.get_browserweb_size().width,
@@ -279,15 +258,16 @@ function applyCoordinates(coords) {
         screen_height : Mir_windowTools.get_screen_size().height,
     };
 	
-	var newX = coords[0] * tracked_values.screen_width - tracked_values.calculated_viewport_x + offsetX;
-  var newY = coords[1] * tracked_values.screen_height - tracked_values.calculated_viewport_y + offsetY;
+	let newX = coords[0] * tracked_values.screen_width - tracked_values.calculated_viewport_x + offsetX;
+  let newY = coords[1] * tracked_values.screen_height - tracked_values.calculated_viewport_y + offsetY;
     
   updateLastCoords(newX,newY);
 }
 
 function mouseMode(value) {
 	useMouse = value;
-	if(useMouse) {
+
+	if (useMouse) {
 		document.addEventListener('mousemove', e => updateLastCoords(e.pageX,e.pageY));
 	} else {
 		document.removeEventListener('mousemove', e => updateLastCoords(e.pageX,e.pageY));
@@ -296,7 +276,9 @@ function mouseMode(value) {
 
 // TOOLS for position transpose
 
-if (!Mir_windowTools) { var Mir_windowTools = new Object(); };
+if (!Mir_windowTools) {
+  let Mir_windowTools = {};
+}
 
 Mir_windowTools = {
     scrollBarPadding: 17, // padding to assume for scroll bars
@@ -306,6 +288,7 @@ Mir_windowTools = {
         //NOT SUPPORTED by IE8 or less
         let coordX = (typeof window.screenLeft == "number") ? window.screenLeft : window.screenX;
         let coordY = (typeof window.screenTop == "number") ? window.screenTop : window.screenY;
+
         return {
             x: coordX,
             y: coordY
@@ -315,9 +298,9 @@ Mir_windowTools = {
     //CUSTOM
     get_browserweb_size: function () {
         //NOT SUPPORTED by IE8 or less
-        var width = window.outerWidth;
-        var height = window.outerHeight;
-        var result = {};
+        let width = window.outerWidth;
+        let height = window.outerHeight;
+        let result = {};
         result.width = width;
         result.height = height;
 
@@ -326,7 +309,8 @@ Mir_windowTools = {
 
     get_document_size: function () {
         // document dimensions
-        var viewportWidth, viewportHeight;
+        let viewportWidth, viewportHeight;
+
         if (window.innerHeight && window.scrollMaxY) {
             viewportWidth = document.body.scrollWidth;
             viewportHeight = window.innerHeight + window.scrollMaxY;
@@ -338,7 +322,8 @@ Mir_windowTools = {
             // explorer mac...would also work in explorer 6 strict, mozilla and safari
             viewportWidth = document.body.offsetWidth;
             viewportHeight = document.body.offsetHeight;
-        };
+        }
+
         return {
             width: viewportWidth,
             height: viewportHeight
@@ -347,7 +332,8 @@ Mir_windowTools = {
 
     get_viewPort_size: function () {
         // view port dimensions
-        var windowWidth, windowHeight;
+        let windowWidth, windowHeight;
+
         if (self.innerHeight) {
             // all except explorer
             windowWidth = self.innerWidth;
@@ -360,7 +346,8 @@ Mir_windowTools = {
             // other explorers
             windowWidth = document.body.clientWidth;
             windowHeight = document.body.clientHeight;
-        };
+        }
+
         return {
             width: windowWidth,
             height: windowHeight
@@ -369,7 +356,8 @@ Mir_windowTools = {
 
     get_scroll_offset: function () {
         // viewport vertical scroll offset
-        var horizontalOffset, verticalOffset;
+        let horizontalOffset, verticalOffset;
+
         if (self.pageYOffset) {
             horizontalOffset = self.pageXOffset;
             verticalOffset = self.pageYOffset;
@@ -381,18 +369,18 @@ Mir_windowTools = {
             // all other Explorers
             horizontalOffset = document.body.scrollLeft;
             verticalOffset = document.body.scrollTop;
-        };
+        }
+
         return {
             horizontal: horizontalOffset,
             vertical: verticalOffset
         };
     },
 	
-    get_screen_size: function() 
-    {
+    get_screen_size: function() {
         return {
             height: window.screen.height,
             width: window.screen.width
         };
-    },
+    }
 };
