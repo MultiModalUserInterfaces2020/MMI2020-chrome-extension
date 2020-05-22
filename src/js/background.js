@@ -44,12 +44,11 @@ function startCapturingAudio () {
       console.log('Start capturing audio...')
       chrome.browserAction.setBadgeText({ text: 'Rec.' })
 
-      VoiceCommandRecognizer.startRecognizing(function (result) {
+      VoiceCommandRecognizer.startRecognizing(function (validCommand, result) {
         stopCapturingAudio();
         stopRecordingMousePosition();
-        if (result === null) {
-          createNotification('Sorry', 'Your command was not recognized');
-        } else {
+
+        if (validCommand) {
           // Run the desired command
           switch (result.transcript) {
             case 'save' :
@@ -57,6 +56,8 @@ function startCapturingAudio () {
 
             case 'example': exampleAction(); break;
           }
+        } else {
+          createNotification('Command not recognized', '«' + result.transcript + '» is not a valid command');
         }
       });
     });
@@ -181,11 +182,11 @@ function createNotification(title, message) {
     let command = e.results[0][0].transcript;
 
     if (onEndCallback !== null) {
+      let validCommand = false;
       if (commands.includes(command)) {
-        onEndCallback(e.results[0][0]);
-      } else {
-        onEndCallback(null);
+        validCommand = true;
       }
+      onEndCallback(validCommand, e.results[0][0]);
       onEndCallback = null;
     }
   }
