@@ -48,7 +48,7 @@ function createNotification(title, message) {
 }
 
 var indicator = document.createElement('div');
-indicator.id = 'indicator';
+indicator.id = 'eyePositionIndicator';
 indicator.style.width = '12px';
 indicator.style.height = '12px';
 indicator.style.background = 'red';
@@ -63,7 +63,7 @@ indicator.style.marginTop = '-6px';
 document.body.appendChild(indicator);
 
 var indicator2 = document.createElement('div');
-indicator2.id = 'indicator2';
+indicator2.id = 'averageEyePositionIndicator';
 indicator2.style.width = '12px';
 indicator2.style.height = '12px';
 indicator2.style.background = 'green';
@@ -216,14 +216,8 @@ function downloadImage() {
   indicator2.style.top=position.y+"px";
   recordLastPositions = false;
   lastPositions = [];
-
-  // if(useMouse){
-  //   position = MousePosition.getPosition();
-  // } else {
-  //   position = getLastCoords();
-  // }
   
-  let element = document.elementFromPoint(position.x, position.y);
+  let element = getElementFromPoint(position.x, position.y);
 
   if (element.nodeName !== 'IMG' || !element.hasAttribute('src')) {
     return false;
@@ -241,6 +235,16 @@ function downloadImage() {
   downloadSource(source);
 
   return source;
+}
+
+function getElementFromPoint(x, y) {
+  let elements = document.elementsFromPoint(x, y);
+
+  if (elements[0].id === 'eyePositionIndicator' || elements[0].id === 'averageEyePositionIndicator') {
+    return elements[1];
+  } else {
+    return elements[0];
+  }
 }
 
 function downloadSource(source) {
