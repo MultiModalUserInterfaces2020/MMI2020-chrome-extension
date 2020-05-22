@@ -203,12 +203,21 @@ function downloadImage() {
   }
 
   let previousStyle = element.hasAttribute('style') ? element.getAttribute('style') : '';
-  let highlightStyle = previousStyle + '; box-shadow: 0 0 10px red';
-  element.setAttribute('style', highlightStyle);
+  let transitionStyle = previousStyle + '; transition: all 0.3s ease;';
+  let highlightStyle = transitionStyle + 'box-shadow: 0 0 20px red';
+  element.setAttribute('style', transitionStyle);
+
+  window.setTimeout(function () {
+    element.setAttribute('style', highlightStyle);
+  }, 1);
+
+  window.setTimeout(function () {
+    element.setAttribute('style', transitionStyle);
+  }, 4000);
 
   window.setTimeout(function () {
     element.setAttribute('style', previousStyle);
-  }, 3000);
+  }, 4350);
 
   let source = element.getAttribute('src');
   downloadSource(source);
