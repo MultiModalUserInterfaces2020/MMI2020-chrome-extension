@@ -52,9 +52,10 @@ let eyePositionIndicator = document.createElement('div');
 eyePositionIndicator.id = 'eyePositionIndicator';
 eyePositionIndicator.style.width = '12px';
 eyePositionIndicator.style.height = '12px';
-eyePositionIndicator.style.background = 'red';
+eyePositionIndicator.style.background = 'lightgreen';
 eyePositionIndicator.style.borderRadius = '6px';
 eyePositionIndicator.style.position = 'fixed';
+eyePositionIndicator.style.display = 'none';
 eyePositionIndicator.style.zIndex = 9999;
 eyePositionIndicator.style.left = '20px';
 eyePositionIndicator.style.top = '20px';
@@ -62,6 +63,15 @@ eyePositionIndicator.style.marginLeft = '-6px';
 eyePositionIndicator.style.marginTop = '-6px';
 
 document.body.appendChild(eyePositionIndicator);
+
+chrome.storage.sync.get(['visualizeEyePosition'], function(options) {
+  console.log(options);
+  if (options.visualizeEyePosition) {
+    eyePositionIndicator.style.display = 'block';
+  }
+});
+
+
 
 let averageEyePositionIndicator = document.createElement('div');
 averageEyePositionIndicator.id = 'averageEyePositionIndicator';
