@@ -277,7 +277,7 @@ function mouseMode(value) {
 // TOOLS for position transpose
 
 if (!Mir_windowTools) {
-  let Mir_windowTools = {};
+  var Mir_windowTools = {};
 }
 
 Mir_windowTools = {
