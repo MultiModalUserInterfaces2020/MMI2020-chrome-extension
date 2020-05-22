@@ -47,29 +47,33 @@ function createNotification(title, message) {
   });
 }
 
-var indicator = document.createElement("div");
-indicator.id = "indicator";
-indicator.style.width = "10px";
-indicator.style.height = "10px";
-indicator.style.background = "red";
-indicator.style.borderRadius = "5px";
-indicator.style.position = "fixed";
+var indicator = document.createElement('div');
+indicator.id = 'indicator';
+indicator.style.width = '12px';
+indicator.style.height = '12px';
+indicator.style.background = 'red';
+indicator.style.borderRadius = '6px';
+indicator.style.position = 'fixed';
 indicator.style.zIndex = 9999;
-indicator.style.left="20px";
-indicator.style.top="20px";
+indicator.style.left = '20px';
+indicator.style.top = '20px';
+indicator.style.marginLeft = '-6px';
+indicator.style.marginTop = '-6px';
 
 document.body.appendChild(indicator);
 
-var indicator2 = document.createElement("div");
-indicator2.id = "indicator2";
-indicator2.style.width = "10px";
-indicator2.style.height = "10px";
-indicator2.style.background = "green";
-indicator2.style.borderRadius = "5px";
-indicator2.style.position = "fixed";
+var indicator2 = document.createElement('div');
+indicator2.id = 'indicator2';
+indicator2.style.width = '12px';
+indicator2.style.height = '12px';
+indicator2.style.background = 'green';
+indicator2.style.borderRadius = '5px';
+indicator2.style.position = 'fixed';
 indicator2.style.zIndex = 9999;
-indicator2.style.left="10px";
-indicator2.style.top="10px";
+indicator2.style.left = '10px';
+indicator2.style.top = '10px';
+indicator.style.marginLeft = '-6px';
+indicator.style.marginTop = '-6px';
 
 document.body.appendChild(indicator2);
 
