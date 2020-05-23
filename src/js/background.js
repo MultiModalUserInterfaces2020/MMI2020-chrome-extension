@@ -54,6 +54,8 @@ function startCapturingAudio () {
             case 'save' :
             case 'download': downloadAction(); break;
 
+            case 'copy': copyAction(); break;
+
             case 'example': exampleAction(); break;
           }
         } else {
@@ -102,6 +104,21 @@ function downloadAction() {
   })
 }
 
+// Copy action: Copy the image at the mouse position
+function copyAction() {
+  chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+    let tabId = tabs[0].id;
+
+    chrome.tabs.sendMessage(tabId, { action: 'COPY_IMAGE' }, response => {
+      if (response) {
+        createNotification('Success', 'Copied the desired image to clipboard');
+      } else {
+        createNotification('Sorry', 'This image could not be copied to clipboard');
+      }
+    });
+  })
+}
+
 // Notify action: notify content script to start recording eye position
 function startRecordingMousePosition() {
   chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
@@ -139,7 +156,7 @@ function createNotification(title, message) {
 (function (VCR) {
   let speechRecognition = webkitSpeechRecognition;
   let speechGrammarList = webkitSpeechGrammarList;
-  let commands = ['example', 'save', 'download'];
+  let commands = ['example', 'save', 'download', 'copy'];
   let grammar = '#JSGF V1.0; grammar colors; public <color> = ' + commands.join(' | ') + ' ;'
   let recognizing = false;
   let onEndCallback = null;

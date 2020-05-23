@@ -65,7 +65,6 @@ eyePositionIndicator.style.marginTop = '-6px';
 document.body.appendChild(eyePositionIndicator);
 
 chrome.storage.sync.get(['visualizeEyePosition'], function(options) {
-  console.log(options);
   if (options.visualizeEyePosition) {
     eyePositionIndicator.style.display = 'block';
   }
@@ -106,7 +105,6 @@ chrome.storage.sync.get(['visualizeEyePosition'], function(options) {
       console.log("Connection with TobiiEye server closed");
     };
     websocket.onerror = function (e) {
-      createNotification("No TobiiEye Server", "Extension was not able to connect to TobiiEye server. Switched to mouse recognition.");
       console.log("Extension was not able to connect to TobiiEye server. Switched to mouse recognition");
       mouseMode(true);
     };
@@ -148,6 +146,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     case 'DOWNLOAD_IMAGE':
       sendResponse(downloadImage());
+      break;
+
+    case 'COPY_IMAGE':
+      sendResponse(copyImage());
       break;
 
     case 'START_RECORDING':
@@ -243,6 +245,50 @@ function downloadImage() {
   return source;
 }
 
+function copyImage() {
+  let position = getAveragePosition();
+  averageEyePositionIndicator.style.left = position.x + "px";
+  averageEyePositionIndicator.style.top = position.y + "px";
+  averageEyePositionIndicator.style.opacity = "0.7";
+
+  window.setTimeout(function() {
+    averageEyePositionIndicator.style.opacity = '0';
+  }, 4000);
+
+  recordLastPositions = false;
+  lastPositions = [];
+
+  let element = getElementFromPoint(position.x, position.y);
+
+  if (element.nodeName !== 'IMG' || !element.hasAttribute('src')) {
+    return false;
+  }
+
+  let previousStyle = element.hasAttribute('style') ? element.getAttribute('style') : '';
+  let transitionStyle = previousStyle + '; transition: all 0.3s ease;';
+  let highlightStyle = transitionStyle + 'box-shadow: 0 0 20px red';
+  element.setAttribute('style', transitionStyle);
+
+  window.setTimeout(function () {
+    element.setAttribute('style', highlightStyle);
+  }, 1);
+
+  window.setTimeout(function () {
+    element.setAttribute('style', transitionStyle);
+  }, 4000);
+
+  window.setTimeout(function () {
+    element.setAttribute('style', previousStyle);
+  }, 4350);
+
+  let source = element.getAttribute('src');
+  return copySource(source).then(resolved => {
+    return source;
+  }, error => {
+    return null;
+  });
+}
+
 function getElementFromPoint(x, y) {
   let elements = document.elementsFromPoint(x, y);
 
@@ -261,6 +307,25 @@ function downloadSource(source) {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+}
+
+async function copySource(source) {
+  const data = await fetch(source);
+  const blob = await data.blob();
+
+  await writeToClipboard(blob);
+}
+
+async function writeToClipboard(imageBlob) {
+  try {
+    await navigator.clipboard.write([
+      new ClipboardItem({
+        'image/png': imageBlob
+      })
+    ]);
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 //================================================

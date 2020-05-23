@@ -10,7 +10,11 @@ With the command `example`, you can download the first image on the currently op
 
 ### Download an image 
 
-With the commands `download` or `save`, you can download the image at the current mouse position.
+With the commands `download` or `save`, you can download the image at the current mouse/gaze position.
+
+### Copy an image to the clipboard
+
+With the command `copy`, you can copy an image at the current mouse/gaze position to the clipboard.
 
 ## Enable the extension
 
